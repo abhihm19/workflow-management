@@ -1,0 +1,32 @@
+<mat-toolbar class="topbar">
+  <button
+    mat-icon-button
+    class="menu-toggle"
+    (click)="toggleSidenav.emit()"
+    [matTooltip]="sidenavCollapsed ? 'Expand menu' : 'Collapse menu'"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <div class="topbar-brand" routerLink="/">
+    <mat-icon class="brand-icon">event_available</mat-icon>
+    <span class="brand-text">Workflow<span class="brand-accent">Management</span></span>
+  </div>
+
+  <span class="topbar-spacer"></span>
+
+  <div class="topbar-user" *ngIf="employees$ | async as employees">
+    <mat-icon class="user-icon">account_circle</mat-icon>
+    <mat-form-field appearance="outline" class="user-select" subscriptSizing="dynamic">
+      <mat-label>Acting as</mat-label>
+      <mat-select
+        [value]="(currentEmployee$ | async)?.id"
+        (selectionChange)="onEmployeeChange($event.value, employees)"
+      >
+        <mat-option *ngFor="let employee of employees" [value]="employee.id">
+          {{ employee.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</mat-toolbar>

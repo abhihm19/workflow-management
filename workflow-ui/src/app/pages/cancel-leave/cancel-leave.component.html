@@ -1,0 +1,91 @@
+<div class="page narrow">
+  <div class="page-header">
+    <div>
+      <h1>Cancel Leave</h1>
+      <p class="page-subtitle">Review the request and let your manager know why you're cancelling.</p>
+    </div>
+  </div>
+
+  <mat-card class="form-card" *ngIf="loading">
+    <div class="loading-row">
+      <mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner>
+    </div>
+  </mat-card>
+
+  <mat-card class="form-card" *ngIf="!loading && loadError">
+    <div class="empty-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>This leave request could not be found.</p>
+      <a mat-button routerLink="/">Back to Leaves</a>
+    </div>
+  </mat-card>
+
+  <mat-card class="form-card" *ngIf="!loading && leave">
+    <div class="leave-summary">
+      <div class="summary-row">
+        <span class="summary-label">Employee</span>
+        <span class="summary-value">{{ leave.employeeName }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Type</span>
+        <span class="summary-value">{{ leave.leaveType }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Dates</span>
+        <span class="summary-value">{{ leave.fromDate }} &rarr; {{ leave.toDate }}</span>
+      </div>
+      <div class="summary-row" *ngIf="leave.reason">
+        <span class="summary-label">Original reason</span>
+        <span class="summary-value">{{ leave.reason }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Current status</span>
+        <app-status-chip [status]="leave.status"></app-status-chip>
+      </div>
+    </div>
+
+    <div class="warning-banner" *ngIf="!isOwner">
+      <mat-icon>warning</mat-icon>
+      Switch "Acting as" to {{ leave.employeeName }} to cancel this leave.
+    </div>
+
+    <div class="warning-banner" *ngIf="isOwner && willNeedApproval">
+      <mat-icon>info</mat-icon>
+      This leave is already approved, so cancelling requires your manager's sign-off.
+      Once approved, any deducted balance for this leave will be credited back.
+    </div>
+
+    <div class="warning-banner" *ngIf="isOwner && !leave.cancellable">
+      <mat-icon>block</mat-icon>
+      This leave can no longer be cancelled (status: {{ leave.status }}).
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="confirmCancel()" *ngIf="leave.cancellable">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Reason for cancellation</mat-label>
+        <textarea
+          matInput
+          rows="4"
+          maxlength="500"
+          formControlName="reason"
+          placeholder="Explain why you're cancelling this leave"
+        ></textarea>
+        <mat-hint align="end">{{ form.value.reason?.length || 0 }}/500</mat-hint>
+        <mat-error *ngIf="form.get('reason')?.hasError('required')">A reason is required</mat-error>
+      </mat-form-field>
+
+      <div class="form-actions">
+        <a mat-button routerLink="/">Back</a>
+        <button
+          mat-flat-button
+          color="warn"
+          type="submit"
+          [disabled]="submitting || !isOwner"
+        >
+          <mat-progress-spinner *ngIf="submitting" diameter="18" mode="indeterminate"></mat-progress-spinner>
+          {{ willNeedApproval ? 'Request Cancellation' : 'Withdraw Leave' }}
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

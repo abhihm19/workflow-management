@@ -1,0 +1,17 @@
+<div class="app-root-layout">
+  <app-topbar [sidenavCollapsed]="sidenavCollapsed" (toggleSidenav)="toggleSidenav()"></app-topbar>
+
+  <div class="app-shell">
+    <aside
+      class="app-sidenav"
+      [class.collapsed]="sidenavCollapsed"
+      [style.width.px]="sidenavCollapsed ? 72 : 248"
+    >
+      <app-sidenav [collapsed]="sidenavCollapsed" (toggleCollapse)="toggleSidenav()"></app-sidenav>
+    </aside>
+
+    <main class="app-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

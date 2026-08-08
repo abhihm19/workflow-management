@@ -1,0 +1,176 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+// Workflow Management brand theme: blue primary / teal accent.
+$workflow-ui-primary: mat.define-palette(mat.$blue-palette, 700, 400, 900);
+$workflow-ui-accent: mat.define-palette(mat.$teal-palette, 600, 300, 800);
+$workflow-ui-warn: mat.define-palette(mat.$red-palette, 600);
+
+$workflow-ui-typography: mat.define-typography-config(
+  $font-family: 'Roboto, "Helvetica Neue", sans-serif',
+);
+
+$workflow-ui-theme: mat.define-light-theme((
+  color: (
+    primary: $workflow-ui-primary,
+    accent: $workflow-ui-accent,
+    warn: $workflow-ui-warn,
+  ),
+  typography: $workflow-ui-typography,
+));
+
+@include mat.all-component-themes($workflow-ui-theme);
+
+/* ============ Design tokens shared across the whole app ============ */
+:root {
+  --color-primary: #1565c0;
+  --color-primary-dark: #0d47a1;
+  --color-accent: #00897b;
+  --color-bg: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-text: #1f2933;
+  --color-text-muted: #64748b;
+  --color-border: #e3e8ef;
+  --color-header-bg: #e8eef7;
+  --color-header-border: #c7d5ea;
+
+  --status-submitted-bg: #fff6e5;
+  --status-submitted-fg: #b45309;
+  --status-submitted-dot: #f59e0b;
+
+  --status-approved-bg: #e6f7ee;
+  --status-approved-fg: #157347;
+  --status-approved-dot: #22c55e;
+
+  --status-rejected-bg: #fdecec;
+  --status-rejected-fg: #b42318;
+  --status-rejected-dot: #ef4444;
+
+  --status-cancellation-pending-bg: #eef1ff;
+  --status-cancellation-pending-fg: #4338ca;
+  --status-cancellation-pending-dot: #6366f1;
+
+  --status-cancelled-bg: #f1f5f9;
+  --status-cancelled-fg: #475569;
+  --status-cancelled-dot: #94a3b8;
+}
+
+/* ============ Global resets & base ============ */
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ============ Shared page/layout utility classes ============ */
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.page.narrow {
+  max-width: 640px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+
+  h1 {
+    margin: 0 0 4px;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+}
+
+.page-subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.form-card {
+  padding: 28px;
+  border-radius: 12px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.date-row {
+  display: flex;
+  gap: 16px;
+
+  .full-width {
+    flex: 1;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+
+  button mat-progress-spinner {
+    display: inline-block;
+    margin-right: 8px;
+  }
+}
+
+.warning-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--status-submitted-bg);
+  color: var(--status-submitted-fg);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+mat-card {
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid var(--color-border);
+}
+
+/* Anchors used as Material buttons should never pick up the browser's default
+   link underline/serif fallback font. */
+a[mat-button],
+a[mat-flat-button],
+a[mat-raised-button],
+a[mat-stroked-button],
+a[mat-icon-button] {
+  text-decoration: none;
+  font-family: inherit;
+}
+
+/* ============ Tooltip: dark, compact style ============ */
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  background-color: #101828 !important;
+  color: #fff !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  padding: 6px 10px !important;
+}

@@ -1,0 +1,57 @@
+.topbar {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 0 var(--color-border);
+  padding: 0 24px;
+  gap: 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.menu-toggle {
+  color: var(--color-text-muted);
+  margin-right: 4px;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.brand-icon {
+  color: var(--color-primary);
+}
+
+.brand-accent {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.topbar-spacer {
+  flex: 1 1 auto;
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-icon {
+  color: var(--color-text-muted);
+}
+
+.user-select {
+  width: 180px;
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    height: 40px;
+  }
+}

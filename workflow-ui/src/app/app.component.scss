@@ -1,0 +1,27 @@
+.app-root-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.app-sidenav {
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: width 0.2s ease;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.app-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--color-bg);
+}

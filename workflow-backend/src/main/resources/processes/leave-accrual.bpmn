@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+	xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+	xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+	xmlns:flowable="http://flowable.org/bpmn"
+	targetNamespace="http://www.syllivo.com/erp/workflow">
+
+	<process id="leaveAccrual" name="Leave Accrual" isExecutable="true">
+		<startEvent id="startEvent" name="Daily Accrual Trigger">
+			<outgoing>flow_start_to_task</outgoing>
+			<timerEventDefinition>
+				<timeCycle>0 0 2 * * ?</timeCycle>
+			</timerEventDefinition>
+		</startEvent>
+
+		<sequenceFlow id="flow_start_to_task" sourceRef="startEvent" targetRef="accrualTask" />
+
+		<serviceTask id="accrualTask" name="Run Leave Accrual" flowable:delegateExpression="${leaveAccrualDelegate}">
+			<incoming>flow_start_to_task</incoming>
+			<outgoing>flow_task_to_end</outgoing>
+		</serviceTask>
+
+		<sequenceFlow id="flow_task_to_end" sourceRef="accrualTask" targetRef="endEvent" />
+
+		<endEvent id="endEvent" name="Accrual Completed">
+			<incoming>flow_task_to_end</incoming>
+		</endEvent>
+	</process>
+
+	<bpmndi:BPMNDiagram id="BPMNDiagram_leaveAccrual">
+		<bpmndi:BPMNPlane id="BPMNPlane_leaveAccrual" bpmnElement="leaveAccrual">
+			<bpmndi:BPMNShape id="startEvent_di" bpmnElement="startEvent">
+				<dc:Bounds x="160" y="160" width="36" height="36" />
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="accrualTask_di" bpmnElement="accrualTask">
+				<dc:Bounds x="260" y="138" width="160" height="80" />
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="endEvent_di" bpmnElement="endEvent">
+				<dc:Bounds x="480" y="160" width="36" height="36" />
+			</bpmndi:BPMNShape>
+
+			<bpmndi:BPMNEdge id="flow_start_to_task_di" bpmnElement="flow_start_to_task">
+				<di:waypoint x="196" y="178" />
+				<di:waypoint x="260" y="178" />
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="flow_task_to_end_di" bpmnElement="flow_task_to_end">
+				<di:waypoint x="420" y="178" />
+				<di:waypoint x="480" y="178" />
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+	</bpmndi:BPMNDiagram>
+</definitions>

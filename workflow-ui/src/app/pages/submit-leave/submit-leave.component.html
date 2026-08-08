@@ -1,0 +1,114 @@
+<div class="page narrow">
+  <div class="page-header">
+    <div>
+      <h1>Submit Leave</h1>
+      <p class="page-subtitle">Fill in the details below to request time off.</p>
+    </div>
+  </div>
+
+  <div class="balance-strip" *ngIf="balances.length > 0">
+    <div class="balance-chip" *ngFor="let balance of balances">
+      <span class="balance-label">{{ balance.label }}</span>
+      <span class="balance-value">{{ balance.available }} <small>available</small></span>
+      <span class="balance-meta" *ngIf="balance.pendingDays > 0">
+        {{ balance.balance }} ledger · {{ balance.pendingDays }} pending approval
+      </span>
+      <span class="balance-meta" *ngIf="balance.pendingDays === 0">{{ balance.balance }} day(s) in account</span>
+    </div>
+  </div>
+
+  <mat-card class="form-card">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="warning-banner" *ngIf="selectedEmployee && !hasManager">
+        <mat-icon>warning</mat-icon>
+        This employee has no reporting manager and cannot submit leave.
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Leave Type</mat-label>
+        <mat-select formControlName="leaveType">
+          <mat-option *ngFor="let type of leaveTypes" [value]="type.code">
+            {{ type.label }}
+          </mat-option>
+        </mat-select>
+        <mat-hint *ngIf="selectedLeaveTypeInfo as info">
+          <ng-container *ngIf="info.accrualEnabled; else capOnly">
+            Available to request:
+            <strong>{{ selectedBalance?.available ?? 0 }} day(s)</strong>
+          </ng-container>
+          <ng-template #capOnly>
+            <ng-container *ngIf="info.capValue">
+              Max entitlement: {{ info.capValue }}
+              {{ info.capUnit === 'WEEKS' ? 'week(s)' : 'day(s)' }}
+            </ng-container>
+            <ng-container *ngIf="!info.capValue">No balance cap; subject to approval</ng-container>
+          </ng-template>
+        </mat-hint>
+        <mat-error *ngIf="form.get('leaveType')?.hasError('required')">Leave type is required</mat-error>
+      </mat-form-field>
+
+      <div class="warning-banner" *ngIf="overlappingLeave as clash">
+        <mat-icon>event_busy</mat-icon>
+        Overlaps with your {{ leaveTypeLabel(clash.leaveType) }} request (#{{ clash.leaveId }}) from
+        {{ clash.fromDate }} to {{ clash.toDate }}. Choose different dates.
+      </div>
+
+      <div class="warning-banner" *ngIf="!overlappingLeave && insufficientBalance">
+        <mat-icon>error_outline</mat-icon>
+        Insufficient balance: {{ requestedDays }} day(s) requested, only
+        {{ selectedBalance?.available ?? 0 }} available
+        <ng-container *ngIf="(selectedBalance?.pendingDays ?? 0) > 0">
+          ({{ selectedBalance?.pendingDays }} day(s) already pending approval).
+        </ng-container>
+      </div>
+
+      <div class="warning-banner" *ngIf="!overlappingLeave && !insufficientBalance && exceedsCap">
+        <mat-icon>error_outline</mat-icon>
+        Requested {{ requestedDays }} day(s) exceeds the entitlement for
+        {{ selectedLeaveTypeInfo?.label }}.
+      </div>
+
+      <div class="date-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>From</mat-label>
+          <input matInput [matDatepicker]="fromPicker" [min]="minDate" formControlName="fromDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+          <mat-datepicker #fromPicker></mat-datepicker>
+          <mat-error *ngIf="form.get('fromDate')?.hasError('required')">Start date is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>To</mat-label>
+          <input matInput [matDatepicker]="toPicker" [min]="form.value.fromDate || minDate" formControlName="toDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+          <mat-datepicker #toPicker></mat-datepicker>
+          <mat-error *ngIf="form.get('toDate')?.hasError('required')">End date is required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <p class="days-hint" *ngIf="requestedDays as days">{{ days }} day(s) requested</p>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Reason</mat-label>
+        <textarea
+          matInput
+          rows="4"
+          maxlength="500"
+          formControlName="reason"
+          placeholder="Let your manager know why you're taking leave"
+        ></textarea>
+        <mat-hint align="end">{{ form.value.reason?.length || 0 }}/500</mat-hint>
+        <mat-error *ngIf="form.get('reason')?.hasError('required')">Reason is required</mat-error>
+      </mat-form-field>
+
+      <div class="form-actions">
+        <a mat-button routerLink="/">Cancel</a>
+        <button mat-flat-button color="primary" type="submit" [disabled]="!canSubmit">
+          <mat-icon *ngIf="!submitting">send</mat-icon>
+          <mat-progress-spinner *ngIf="submitting" diameter="18" mode="indeterminate"></mat-progress-spinner>
+          Submit
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

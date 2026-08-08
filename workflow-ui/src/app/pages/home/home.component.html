@@ -1,0 +1,104 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Leave Requests</h1>
+      <p class="page-subtitle">Track submissions, approvals and cancellations in one place.</p>
+    </div>
+    <a mat-flat-button color="primary" routerLink="/submit-leave" class="new-leave-btn">
+      <mat-icon>add</mat-icon>
+      Submit Leave
+    </a>
+  </div>
+
+  <div class="balance-strip" *ngIf="balances.length > 0">
+    <div class="balance-chip" *ngFor="let balance of balances">
+      <span class="balance-label">{{ balance.label }}</span>
+      <span class="balance-value">{{ balance.available }} <small>available</small></span>
+      <span class="balance-meta" *ngIf="balance.pendingDays > 0">
+        {{ balance.balance }} in account · {{ balance.pendingDays }} pending
+      </span>
+      <span class="balance-meta" *ngIf="balance.pendingDays === 0">
+        {{ balance.balance }} day(s) in account
+      </span>
+    </div>
+  </div>
+
+  <mat-card class="leave-card">
+    <!-- <div class="card-toolbar">
+      <span class="toolbar-spacer"></span>
+      <button mat-icon-button matTooltip="Refresh" (click)="fetchLeaves()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div> -->
+
+    <!-- <div class="loading-row" *ngIf="loading">
+      <mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner>
+    </div> -->
+
+    <div class="empty-state" *ngIf="!loading && leaves.length === 0">
+      <mat-icon>event_busy</mat-icon>
+      <p>No leave requests found.</p>
+    </div>
+
+    <table
+      mat-table
+      [dataSource]="leaves"
+      [trackBy]="trackByLeaveId"
+      *ngIf="!loading && leaves.length > 0"
+      class="leave-table"
+    >
+      <ng-container matColumnDef="leaveId">
+        <th mat-header-cell *matHeaderCellDef>Leave ID</th>
+        <td mat-cell *matCellDef="let leave">
+          <span class="leave-id">#{{ leave.leaveId }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="leaveType">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let leave">{{ leaveTypeLabel(leave.leaveType) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="dates">
+        <th mat-header-cell *matHeaderCellDef>Dates</th>
+        <td mat-cell *matCellDef="let leave">{{ leave.fromDate }} &rarr; {{ leave.toDate }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="reason">
+        <th mat-header-cell *matHeaderCellDef>Reason</th>
+        <td mat-cell *matCellDef="let leave">
+          <span class="reason-text" [matTooltip]="leave.reason || ''">{{ leave.reason || '—' }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="approver">
+        <th mat-header-cell *matHeaderCellDef>Approver</th>
+        <td mat-cell *matCellDef="let leave">{{ leave.approverName || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let leave">
+          <app-status-chip [status]="leave.status"></app-status-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Action</th>
+        <td mat-cell *matCellDef="let leave">
+          <button
+            mat-stroked-button
+            color="warn"
+            *ngIf="leave.cancellable"
+            (click)="onCancel(leave)"
+          >
+            Cancel
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns" [class.row-inactive]="row.status === 'CANCELLED' || row.status === 'REJECTED'"></tr>
+    </table>
+  </mat-card>
+</div>

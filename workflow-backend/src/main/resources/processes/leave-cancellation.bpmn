@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+	xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+	xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+	xmlns:flowable="http://flowable.org/bpmn"
+	targetNamespace="http://www.syllivo.com/erp/workflow">
+
+	<process id="leaveCancellation" name="Leave Cancellation" isExecutable="true">
+		<startEvent id="startEvent" name="Cancellation Requested">
+			<outgoing>flow_start_to_rm</outgoing>
+		</startEvent>
+
+		<sequenceFlow id="flow_start_to_rm" sourceRef="startEvent" targetRef="rmCancellationApprovalTask" />
+
+		<userTask id="rmCancellationApprovalTask" name="Reporting Manager Cancellation Approval" flowable:assignee="${approverId}">
+			<incoming>flow_start_to_rm</incoming>
+			<outgoing>flow_rm_to_decision</outgoing>
+		</userTask>
+
+		<sequenceFlow id="flow_rm_to_decision" sourceRef="rmCancellationApprovalTask" targetRef="cancellationDecision" />
+
+		<exclusiveGateway id="cancellationDecision" name="Cancellation Approved?">
+			<incoming>flow_rm_to_decision</incoming>
+			<outgoing>flow_approved</outgoing>
+			<outgoing>flow_rejected</outgoing>
+		</exclusiveGateway>
+
+		<sequenceFlow id="flow_approved" name="Approved" sourceRef="cancellationDecision" targetRef="approvedEnd">
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
+		</sequenceFlow>
+
+		<sequenceFlow id="flow_rejected" name="Rejected" sourceRef="cancellationDecision" targetRef="rejectedEnd">
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
+		</sequenceFlow>
+
+		<endEvent id="approvedEnd" name="Leave Cancelled">
+			<incoming>flow_approved</incoming>
+		</endEvent>
+
+		<endEvent id="rejectedEnd" name="Cancellation Rejected">
+			<incoming>flow_rejected</incoming>
+		</endEvent>
+	</process>
+
+	<bpmndi:BPMNDiagram id="BPMNDiagram_leaveCancellation">
+		<bpmndi:BPMNPlane id="BPMNPlane_leaveCancellation" bpmnElement="leaveCancellation">
+			<bpmndi:BPMNShape id="startEvent_di" bpmnElement="startEvent">
+				<dc:Bounds x="160" y="160" width="36" height="36" />
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="rmCancellationApprovalTask_di" bpmnElement="rmCancellationApprovalTask">
+				<dc:Bounds x="260" y="138" width="160" height="80" />
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="cancellationDecision_di" bpmnElement="cancellationDecision" isMarkerVisible="true">
+				<dc:Bounds x="500" y="153" width="50" height="50" />
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="approvedEnd_di" bpmnElement="approvedEnd">
+				<dc:Bounds x="650" y="80" width="36" height="36" />
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="rejectedEnd_di" bpmnElement="rejectedEnd">
+				<dc:Bounds x="650" y="240" width="36" height="36" />
+			</bpmndi:BPMNShape>
+
+			<bpmndi:BPMNEdge id="flow_start_to_rm_di" bpmnElement="flow_start_to_rm">
+				<di:waypoint x="196" y="178" />
+				<di:waypoint x="260" y="178" />
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="flow_rm_to_decision_di" bpmnElement="flow_rm_to_decision">
+				<di:waypoint x="420" y="178" />
+				<di:waypoint x="500" y="178" />
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="flow_approved_di" bpmnElement="flow_approved">
+				<di:waypoint x="525" y="153" />
+				<di:waypoint x="525" y="98" />
+				<di:waypoint x="650" y="98" />
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="flow_rejected_di" bpmnElement="flow_rejected">
+				<di:waypoint x="525" y="203" />
+				<di:waypoint x="525" y="258" />
+				<di:waypoint x="650" y="258" />
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+	</bpmndi:BPMNDiagram>
+</definitions>
